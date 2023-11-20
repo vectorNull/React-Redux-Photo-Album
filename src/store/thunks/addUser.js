@@ -6,7 +6,7 @@ const addUser = createAsyncThunk('users/add', async () => {
   const response = await axios.post('http://localhost:3005/users', {
     name: faker.person.fullName()
   });
-
+  //* action.payload property
   return response.data;
 });
 
