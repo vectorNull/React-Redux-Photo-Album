@@ -1,11 +1,13 @@
 import React from 'react'
 import { useFetchAlbumsQuery, useCreateAlbumMutation } from '../store';
 import Skeleton from './Skeleton';
-import ExpandablePanel from './ExpandablePanel';
 import Button from './Button';
+import AlbumsListItem from './AlbumsListItem';
 
 function AlbumsList({ user }) {
-  const { data, error, isLoading } = useFetchAlbumsQuery(user);
+  //* Use isFetching instead of isLoading; isLoading === true only first time you make req
+  //* isFetching === true EACH TIME req is made
+  const { data, error, isFetching } = useFetchAlbumsQuery(user);
 
   //* 'results' is an object with similar properties contained 
   //* in the above query useFetchAlbumsQuery (results = { ..., data, error, isLoading, etc })
@@ -16,16 +18,13 @@ function AlbumsList({ user }) {
   };
 
   let content;
-  if (isLoading) {
+  if (isFetching) {
     content = <Skeleton className='h-10 w-full' times={3} />
   } else if (error) {
     content = <div>Error fetching albums...</div>
   } else {
     content = data.map(album => {
-      const header = <div>{album.title}</div>
-      return <ExpandablePanel key={album.id} header={header}>
-        List of photos in album
-      </ExpandablePanel> 
+      return <AlbumsListItem key={album.id} album={album} />
     })
   }
 

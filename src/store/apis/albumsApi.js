@@ -15,7 +15,11 @@ const albumsApi = createApi({
         //* args for providesTags include whatever was passed to the hook.
         //* So the user will be there as well. Might be named 'arg' but in this case, its just the user
         providesTags: (result, error, user) => {
-          return [{ type: 'album', id: user.id }]
+          const tags = result.map(album => {
+            return { type: 'album', id: album.id};
+          });
+          tags.push({ type: 'UsersAlbums', id: user.id });
+          return tags;
         },
         query: (user) => {
           return {
@@ -29,7 +33,7 @@ const albumsApi = createApi({
       }),
       createAlbum: builder.mutation({
         invalidatesTags: (result, error, user) => {
-          return [{ type: 'album', id: user.id}]
+          return [{ type: 'UsersAlbum', id: user.id}]
         },
         query: (user) => {
           return {
@@ -41,11 +45,22 @@ const albumsApi = createApi({
             }
           }
         }
+      }),
+      deleteAlbum: builder.mutation({
+        invalidatesTags: (result, error, album) => {
+          return [{ type: 'album', id: album.id }]
+        },
+        query: (album) => {
+          return {
+            url: `/albums/${album.id}`,
+            method: 'DELETE',
+          }
+        }
       })
     }
   }
 
 });
 
-export const { useFetchAlbumsQuery, useCreateAlbumMutation } = albumsApi;
+export const { useFetchAlbumsQuery, useCreateAlbumMutation, useDeleteAlbumMutation } = albumsApi;
 export { albumsApi };
